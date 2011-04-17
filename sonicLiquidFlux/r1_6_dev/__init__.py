@@ -153,7 +153,7 @@ def main_standalone( argc, argv ):
         piso, nCorr, nNonOrthCorr, momentumPredictor, transonic, nOuterCorr = readPISOControls( mesh )
 
         from Foam.finiteVolume.cfdTools.compressible import compressibleCourantNo
-        CoNum, meanCoNum = compressibleCourantNo( mesh, phi, rho, runTime )
+        CoNum, meanCoNum, velMag = compressibleCourantNo( mesh, phi, rho, runTime )
         
         from Foam.finiteVolume.cfdTools.compressible import rhoEqn
         rhoEqn( rho, phi )
@@ -204,40 +204,17 @@ def main_standalone( argc, argv ):
 
 #--------------------------------------------------------------------------------------
 import sys, os
-from Foam import FOAM_REF_VERSION, FOAM_VERSION
-if FOAM_VERSION( "<", "010600" ):
+from Foam import FOAM_BRANCH_VERSION
+if FOAM_BRANCH_VERSION( "dev", ">=", "010600" ):
+   if __name__ == "__main__" :
+      argv = sys.argv
+      os._exit( main_standalone( len( argv ), argv ) )
+      pass
+else:
    from Foam.OpenFOAM import ext_Info
    ext_Info() << "\n\n To use this solver it is necessary to SWIG OpenFOAM-1.6 or higher\n"
    pass
 
 
-#--------------------------------------------------------------------------------------
-if FOAM_REF_VERSION( "==", "010600" ):
-   if __name__ == "__main__" :
-      argv = sys.argv
-      if len(argv) > 1 and argv[ 1 ] == "-test":
-         argv = None
-         test_dir= os.path.join( os.environ[ "PYFOAM_TESTING_DIR" ],'cases', 'propogated', 'r1.6', 'compressible', 'sonicLiquidFoam', 'decompressionTank' )
-         argv = [ __file__, "-case", test_dir ]
-         pass
-      os._exit( main_standalone( len( argv ), argv ) )
-      pass
-   pass   
-
-    
-#--------------------------------------------------------------------------------------
-if FOAM_REF_VERSION( ">=", "010700" ):
-   if __name__ == "__main__" :
-      argv = sys.argv
-      if len(argv) > 1 and argv[ 1 ] == "-test":
-         argv = None
-         test_dir= os.path.join( os.environ[ "PYFOAM_TESTING_DIR" ],'cases', 'propogated', 'r1.6', 'compressible', 'sonicLiquidFoam', 'decompressionTank' )
-         argv = [ __file__, "-case", test_dir ]
-         pass
-      os._exit( main_standalone( len( argv ), argv ) )
-      pass
-   pass   
-
-    
 #--------------------------------------------------------------------------------------
 
