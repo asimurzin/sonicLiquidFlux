@@ -136,28 +136,27 @@ def main_standalone( argc, argv ):
     while runTime.loop():
  
         ref.ext_Info()<< "Time = " << runTime.timeName() << ref.nl << ref.nl
-      
+       
         piso, nCorr, nNonOrthCorr, momentumPredictor, transonic, nOuterCorr = ref.readPISOControls( mesh )
-      
+
         CoNum, meanCoNum = ref.compressibleCourantNo( mesh, phi, rho, runTime )
-      
+
         ref.rhoEqn( rho, phi )
 
         UEqn = man.fvm.ddt( rho, U ) + man.fvm.div( phi, U ) - man.fvm.laplacian( mu, U )
         
         ref.solve( UEqn == -man.fvc.grad( p ) )
 
-
         # --- PISO loop
         for corr in range( nCorr ):
                
             rAU = 1.0 / UEqn.A()
-            U <<= rAU * UEqn.H()
+            U << rAU * UEqn.H()
 
             phid = ref.surfaceScalarField( ref.word( "phid" ), 
                                            psi * ( ( ref.fvc.interpolate( U ) & mesh.Sf() ) + ref.fvc.ddtPhiCorr( rAU, rho(), U(), phi() ) ) )
 
-            phi <<= ( rhoO / psi ) * phid
+            phi << ( rhoO / psi ) * phid
             pEqn = ref.fvm.ddt( psi, p() ) + ref.fvc.div( phi() ) + ref.fvm.div( phid, p() ) - ref.fvm.laplacian( rho() * rAU, p() )
  
             pEqn.solve()
@@ -169,7 +168,7 @@ def main_standalone( argc, argv ):
             U -= rAU * ref.fvc.grad( p )
             U.correctBoundaryConditions()
             pass
-        rho <<= rhoO + psi * p
+        rho << rhoO + psi * p
 
         runTime.write()
 
