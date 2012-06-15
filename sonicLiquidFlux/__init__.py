@@ -25,7 +25,7 @@
 
 #---------------------------------------------------------------------------
 from Foam import FOAM_VERSION, FOAM_REF_VERSION, FOAM_BRANCH_VERSION
-if FOAM_REF_VERSION( ">=", "010600" ):
+if FOAM_REF_VERSION( ">=", "010600" ) and FOAM_REF_VERSION( "<=", "010701" ):
     from sonicLiquidFlux.r1_6 import *
     pass
 
